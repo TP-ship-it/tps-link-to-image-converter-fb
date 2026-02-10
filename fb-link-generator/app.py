@@ -132,6 +132,14 @@ def init_db():
     conn.close()
 
 
+# Ensure database is initialized even when running under gunicorn / production WSGI
+try:
+    init_db()
+except Exception as e:
+    # Fail silently here; detailed errors will appear when endpoints try to use the DB
+    print(f"WARNING: init_db() at import time failed: {e}")
+
+
 def generate_slug(length=6):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
