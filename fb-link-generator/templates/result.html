@@ -181,7 +181,7 @@
         }
     </style>
 </head>
-<body>
+<body data-csrf-token="{{ csrf_token() }}">
     <div class="wrap">
         <div class="title">เสร็จแล้ว! ถึงเวลาแชร์ลงโซเชียลแล้ว!</div>
 
@@ -222,6 +222,51 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h10a2 2 0 0 1 2 2v10H10a2 2 0 0 1-2-2V7z"/><path d="M6 17H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                 สร้างการ์ดที่คล้ายกัน
             </a>
+        </div>
+
+        <!-- ปุ่มสร้าง Facebook Post พร้อมปุ่ม CTA -->
+        <div class="actions" style="margin-top: 18px;">
+            <button type="button" class="actionBtn" id="createFbPostBtn">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.9.3-1.6 1.7-1.6h1.6V4.8c-.3 0-1.4-.1-2.7-.1-2.7 0-4.5 1.6-4.5 4.6V11H7v3h2.4v8h4.1z"/></svg>
+                สร้าง Facebook Post พร้อมปุ่ม CTA
+            </button>
+        </div>
+
+        <!-- Facebook Post Modal -->
+        <div id="fbPostModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+            <div style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:90%; max-width:520px; border-radius:12px;">
+                <h2 style="margin-top:0;">สร้าง Facebook Post พร้อมปุ่ม CTA</h2>
+                <form id="fbPostForm">
+                    <label for="pageId">Facebook Page ID:</label>
+                    <input type="text" id="pageId" name="page_id" required style="width:100%; padding:8px; margin-bottom:10px;"><br>
+
+                    <label for="pageAccessToken">Page Access Token:</label>
+                    <input type="text" id="pageAccessToken" name="page_access_token" required style="width:100%; padding:8px; margin-bottom:10px;"><br>
+
+                    <label for="postMessage">ข้อความโพสต์ (ไม่บังคับ):</label>
+                    <textarea id="postMessage" name="message" rows="3" style="width:100%; padding:8px; margin-bottom:10px;"></textarea><br>
+
+                    <label for="ctaType">ประเภทปุ่ม CTA:</label>
+                    <select id="ctaType" name="cta_type" style="width:100%; padding:8px; margin-bottom:10px;">
+                        <option value="LEARN_MORE">LEARN_MORE</option>
+                        <option value="APPLY_NOW">APPLY_NOW</option>
+                        <option value="SHOP_NOW">SHOP_NOW</option>
+                        <option value="SIGN_UP">SIGN_UP</option>
+                        <option value="CONTACT_US">CONTACT_US</option>
+                        <option value="DOWNLOAD">DOWNLOAD</option>
+                        <option value="GET_QUOTE">GET_QUOTE</option>
+                    </select><br>
+
+                    <label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+                        <input type="checkbox" id="publishImmediately" name="published" checked>
+                        โพสต์ทันที (published)
+                    </label><br><br>
+
+                    <button type="submit" class="btn">สร้าง Post</button>
+                    <button type="button" id="closeFbPostModalBtn" class="btn" style="background:#9ca3af; margin-left:8px;">ยกเลิก</button>
+                </form>
+                <div id="fbPostStatus" style="margin-top:10px; color:green;"></div>
+            </div>
         </div>
 
         <div class="footerNote">Tip: ถ้ารูปไม่ขึ้นในโพสต์ ให้เอาลิงก์ไปเช็คที่ Facebook Sharing Debugger</div>
@@ -271,6 +316,92 @@
             if ('{{ site_name }}') params.set('site_name', '{{ site_name }}');
             if ('{{ button_text }}') params.set('button_text', '{{ button_text }}');
             similar.href = '/compose?' + params.toString();
+
+            // ====== Facebook CTA Post Integration ======
+            var createFbPostBtn = document.getElementById('createFbPostBtn');
+            var fbPostModal = document.getElementById('fbPostModal');
+            var closeFbPostModalBtn = document.getElementById('closeFbPostModalBtn');
+            var fbPostForm = document.getElementById('fbPostForm');
+            var fbPostStatus = document.getElementById('fbPostStatus');
+            var csrfToken = document.body.getAttribute('data-csrf-token') || '';
+
+            function getSlugFromFullLink(url) {
+                try {
+                    var u = new URL(url);
+                    var parts = u.pathname.split('/');
+                    return parts.filter(Boolean).pop() || '';
+                } catch (e) {
+                    var parts2 = (url || '').split('/');
+                    return parts2.filter(Boolean).pop() || '';
+                }
+            }
+
+            var slug = getSlugFromFullLink(fullLink);
+
+            if (createFbPostBtn && fbPostModal && fbPostForm && fbPostStatus) {
+                createFbPostBtn.addEventListener('click', function () {
+                    fbPostModal.style.display = 'block';
+                    fbPostStatus.textContent = '';
+                    fbPostStatus.style.color = 'green';
+                });
+
+                if (closeFbPostModalBtn) {
+                    closeFbPostModalBtn.addEventListener('click', function () {
+                        fbPostModal.style.display = 'none';
+                        fbPostStatus.textContent = '';
+                    });
+                }
+
+                fbPostForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    fbPostStatus.style.color = 'green';
+                    fbPostStatus.textContent = 'กำลังสร้างโพสต์...';
+
+                    var pageId = document.getElementById('pageId').value.trim();
+                    var pageAccessToken = document.getElementById('pageAccessToken').value.trim();
+                    var postMessage = document.getElementById('postMessage').value;
+                    var ctaType = document.getElementById('ctaType').value;
+                    var published = document.getElementById('publishImmediately').checked;
+
+                    if (!pageId || !pageAccessToken || !slug) {
+                        fbPostStatus.style.color = 'red';
+                        fbPostStatus.textContent = 'กรุณากรอก Page ID, Access Token ให้ครบ และตรวจสอบลิงก์อีกครั้ง';
+                        return;
+                    }
+
+                    var payload = {
+                        csrf_token: csrfToken,
+                        page_id: pageId,
+                        page_access_token: pageAccessToken,
+                        slug: slug,
+                        message: postMessage,
+                        cta_type: ctaType,
+                        published: published
+                    };
+
+                    fetch('/api/create-facebook-post', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(function (response) { return response.json(); })
+                    .then(function (data) {
+                        if (data && data.success) {
+                            fbPostStatus.style.color = 'green';
+                            fbPostStatus.textContent = 'สร้างโพสต์สำเร็จ! Post ID: ' + (data.post_id || '');
+                        } else {
+                            fbPostStatus.style.color = 'red';
+                            fbPostStatus.textContent = 'เกิดข้อผิดพลาด: ' + (data && data.error ? data.error : 'Unknown error');
+                        }
+                    })
+                    .catch(function (error) {
+                        fbPostStatus.style.color = 'red';
+                        fbPostStatus.textContent = 'เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + error;
+                    });
+                });
+            }
         })();
     </script>
 </body>
