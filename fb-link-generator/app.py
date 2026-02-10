@@ -973,31 +973,36 @@ def create_facebook_ad_post_api():
         }
 
         resp = requests.post(graph_url, json=payload)
+        # DEBUG: log raw response for server-side inspection
         try:
-            resp.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            # พยายามดึง error จริงจาก Facebook
-            err_text = str(e)
-            try:
-                err_json = resp.json()
-                fb_err = err_json.get("error", {}).get("message")
-                if fb_err:
-                    err_text = fb_err
-            except Exception:
-                pass
+            print("DEBUG create-facebook-ad-post:", resp.status_code, resp.text[:500])
+        except Exception:
+            pass
 
+        result = {}
+        try:
+            result = resp.json()
+        except Exception:
+            result = {"raw_text": resp.text}
+
+        # ถ้า Facebook ส่ง error object มา ให้ส่งกลับไปทั้งก้อนเพื่อ debug ง่าย
+        if resp.status_code >= 400 or "error" in result:
+            fb_error = result.get("error", {})
             return jsonify({
-                'success': False,
-                'error': err_text
+                "success": False,
+                "status_code": resp.status_code,
+                "error": fb_error.get("message") or "Facebook API error",
+                "error_code": fb_error.get("code"),
+                "error_subcode": fb_error.get("error_subcode"),
+                "fb_response": result,
             }), 500
 
-        result = resp.json()
         creative_id = result.get("id")
 
         return jsonify({
-            'success': True,
-            'creative_id': creative_id,
-            'data': result
+            "success": True,
+            "creative_id": creative_id,
+            "data": result,
         })
 
     except Exception as e:
