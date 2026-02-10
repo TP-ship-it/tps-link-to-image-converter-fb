@@ -897,6 +897,116 @@ def create_facebook_post_api():
         }), 500
 
 
+@app.route('/api/create-facebook-ad-post', methods=['POST'])
+def create_facebook_ad_post_api():
+    """
+    API สำหรับสร้าง Facebook Dark Post (Ad Creative) พร้อมปุ่ม CTA ผ่าน Marketing API
+
+    ต้องการ parameters (JSON):
+    - ad_account_id: เลข Ad Account ID (เช่น 4376xxxxxxxxxxxx)
+    - page_id: Facebook Page ID
+    - page_access_token: Access Token ที่มีสิทธิ์ ads_management + pages_manage_posts
+    - slug: Slug ของลิงก์ที่สร้างไว้แล้ว (ใช้เป็น link ปลายทาง)
+    - message: ข้อความโพสต์ (optional)
+    - cta_type: ประเภทปุ่ม CTA (APPLY_NOW, LEARN_MORE, SHOP_NOW, SIGN_UP, ...)
+    """
+    try:
+        data = request.get_json() or {}
+
+        ad_account_id = (data.get('ad_account_id') or '').strip()
+        page_id = (data.get('page_id') or '').strip()
+        page_access_token = (data.get('page_access_token') or '').strip()
+        slug = (data.get('slug') or '').strip()
+        message = data.get('message') or ''
+        cta_type = data.get('cta_type') or 'LEARN_MORE'
+
+        if not ad_account_id or not page_id or not page_access_token or not slug:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required fields: ad_account_id, page_id, page_access_token, slug'
+            }), 400
+
+        # ดึงข้อมูลลิงก์จาก database
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT * FROM links WHERE slug=?", (slug,))
+        link = c.fetchone()
+        conn.close()
+
+        if not link:
+            return jsonify({
+                'success': False,
+                'error': 'Link not found'
+            }), 404
+
+        link_url = f"{request.host_url.rstrip('/')}/{slug}"
+        img_url = link[2] or ''
+
+        if not message:
+            message = link[3] or ''
+
+        # endpoint สำหรับสร้าง Ad Creative (Dark Post)
+        api_version = "v19.0"
+        graph_url = f"https://graph.facebook.com/{api_version}/act_{ad_account_id}/adcreatives"
+
+        object_story_spec = {
+            "page_id": page_id,
+            "link_data": {
+                "link": link_url,
+                "message": message,
+                "call_to_action": {
+                    "type": cta_type,
+                    "value": {
+                        "link": link_url
+                    },
+                },
+            },
+        }
+
+        if img_url:
+            object_story_spec["link_data"]["picture"] = img_url
+
+        payload = {
+            "access_token": page_access_token,
+            "name": "TPS Link CTA Dark Post",
+            "object_story_spec": object_story_spec,
+        }
+
+        resp = requests.post(graph_url, json=payload)
+        try:
+            resp.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            # พยายามดึง error จริงจาก Facebook
+            err_text = str(e)
+            try:
+                err_json = resp.json()
+                fb_err = err_json.get("error", {}).get("message")
+                if fb_err:
+                    err_text = fb_err
+            except Exception:
+                pass
+
+            return jsonify({
+                'success': False,
+                'error': err_text
+            }), 500
+
+        result = resp.json()
+        creative_id = result.get("id")
+
+        return jsonify({
+            'success': True,
+            'creative_id': creative_id,
+            'data': result
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 if __name__ == '__main__':
     init_db()
     debug = os.environ.get('FLASK_DEBUG', '0') == '1'

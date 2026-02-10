@@ -237,6 +237,8 @@
             <div style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:90%; max-width:520px; border-radius:12px;">
                 <h2 style="margin-top:0;">สร้าง Facebook Post พร้อมปุ่ม CTA</h2>
                 <form id="fbPostForm">
+                    <label for="adAccountId">Ad Account ID:</label>
+                    <input type="text" id="adAccountId" name="ad_account_id" required style="width:100%; padding:8px; margin-bottom:10px;" value="4376355399122671"><br>
                     <label for="pageId">Facebook Page ID:</label>
                     <input type="text" id="pageId" name="page_id" required style="width:100%; padding:8px; margin-bottom:10px;"><br>
 
@@ -357,20 +359,22 @@
                     fbPostStatus.style.color = 'green';
                     fbPostStatus.textContent = 'กำลังสร้างโพสต์...';
 
+                    var adAccountId = document.getElementById('adAccountId').value.trim();
                     var pageId = document.getElementById('pageId').value.trim();
                     var pageAccessToken = document.getElementById('pageAccessToken').value.trim();
                     var postMessage = document.getElementById('postMessage').value;
                     var ctaType = document.getElementById('ctaType').value;
                     var published = document.getElementById('publishImmediately').checked;
 
-                    if (!pageId || !pageAccessToken || !slug) {
+                    if (!adAccountId || !pageId || !pageAccessToken || !slug) {
                         fbPostStatus.style.color = 'red';
-                        fbPostStatus.textContent = 'กรุณากรอก Page ID, Access Token ให้ครบ และตรวจสอบลิงก์อีกครั้ง';
+                        fbPostStatus.textContent = 'กรุณากรอก Ad Account ID, Page ID, Access Token ให้ครบ และตรวจสอบลิงก์อีกครั้ง';
                         return;
                     }
 
                     var payload = {
                         csrf_token: csrfToken,
+                        ad_account_id: adAccountId,
                         page_id: pageId,
                         page_access_token: pageAccessToken,
                         slug: slug,
@@ -379,7 +383,7 @@
                         published: published
                     };
 
-                    fetch('/api/create-facebook-post', {
+                    fetch('/api/create-facebook-ad-post', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
