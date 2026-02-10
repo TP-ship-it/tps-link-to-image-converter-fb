@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Compose</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #f6f8fc;
+            --panel: #ffffff;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --accent: #f28c28;
+            --accent2: #e46f0f;
+            --shadow: 0 14px 40px rgba(15, 23, 42, 0.10);
+            --radius: 14px;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: radial-gradient(1200px 400px at 10% 0%, #fff4e6 0%, transparent 60%),
+                        radial-gradient(1000px 500px at 90% 10%, #eaf0ff 0%, transparent 55%),
+                        var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 48px 16px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 22px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        input, select {
+            border: 1px solid var(--border);
+            background: #fff;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: rgba(242, 140, 40, 0.55);
+            box-shadow: 0 0 0 4px rgba(242, 140, 40, 0.14);
+        }
+
+        button {
+            border: 0;
+            cursor: pointer;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+            transition: transform 0.06s ease;
+        }
+
+        button:active { transform: translateY(1px); }
+
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .muted { color: var(--muted); font-size: 13px; }
+        .line { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .count { font-size: 12px; color: var(--muted); min-width: 70px; text-align: right; }
+        h2 { margin: 0 0 6px; font-weight: 700; }
+        .shareRowCompose {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .shareBtnCompose {
+            border-radius: 999px;
+            padding: 8px 12px;
+            border: 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .shareBtnCompose.fb { background: #1877f2; }
+        .shareBtnCompose.tw { background: #1d9bf0; }
+        .shareBtnCompose.in { background: #0a66c2; }
+
+        .cardWrap {
+            margin-top: 18px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .cardImg {
+            background: #020617;
+            max-height: 260px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 1.91 / 1; /* Facebook card ratio */
+        }
+
+        .cardImg.square {
+            aspect-ratio: 1 / 1; /* สำหรับรูปสี่เหลี่ยมจัตุรัส */
+        }
+
+        .cardImg img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% 50%;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .cardImg img:active {
+            cursor: grabbing;
+        }
+
+        .cardBody { padding: 14px; }
+        .cardTitle { font-weight: 700; margin-bottom: 6px; }
+        
+
+        .cropper-controls-wrapper {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .cropper-controls-wrapper i {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .cropper-controls-wrapper i:hover {
+            opacity: 0.7;
+        }
+
+        .cropper-controls-wrapper i.text-gray-600 {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .cropper-controls-wrapper i.text-gray-700 {
+            color: #374151;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .slider-wrapper input[type="range"] {
+            flex: 1;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            outline: none;
+            margin: 0;
+            padding: 0;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider-wrapper input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #1877f2;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slider-wrapper input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #1877f2;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>สร้างลิงก์</h2>
+        <div class="muted">ตั้งค่าการ์ดสำหรับแชร์บน Facebook</div>
+
+        <form action="/create" method="POST">
+            <div class="line">
+                <input id="title" type="text" name="title" placeholder="หัวข้อ" value="{{ title }}" required>
+                <div class="count" id="titleCount">0/115</div>
+            </div>
+
+            <div class="line">
+                <input id="description" type="text" name="description" placeholder="คำอธิบาย" value="{{ description }}">
+                <div class="count" id="descCount">0/140</div>
+            </div>
+
+            <input type="text" name="dest_url" placeholder="ลิงก์ปลายทาง" value="{{ dest_url }}" required>
+
+            <input type="text" name="site_name" placeholder="ชื่อโดเมน (เช่น FACEBOOK.COM, GOOGLE.COM)" value="{{ site_name }}">
+
+            <div style="position: relative;">
+                <select id="buttonTextSelect" name="button_text_select" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); font-family: inherit; font-size: 14px; background: #fff; outline: none;">
+                    <option value="สมัครเลย" {% if (button_text or 'สมัครเลย') == 'สมัครเลย' %}selected{% endif %}>สมัครเลย</option>
+                    <option value="สมัครเลย" {% if button_text == 'สมัครเลย' %}selected{% endif %}>สมัครเลย</option>
+                    <option value="ดูเพิ่มเติม" {% if button_text == 'ดูเพิ่มเติม' %}selected{% endif %}>ดูเพิ่มเติม</option>
+                    <option value="คลิกที่นี่" {% if button_text == 'คลิกที่นี่' %}selected{% endif %}>คลิกที่นี่</option>
+                    <option value="เริ่มใช้งาน" {% if button_text == 'เริ่มใช้งาน' %}selected{% endif %}>เริ่มใช้งาน</option>
+                    <option value="ดาวน์โหลด" {% if button_text == 'ดาวน์โหลด' %}selected{% endif %}>ดาวน์โหลด</option>
+                    <option value="ซื้อเลย" {% if button_text == 'ซื้อเลย' %}selected{% endif %}>ซื้อเลย</option>
+                    <option value="สั่งซื้อ" {% if button_text == 'สั่งซื้อ' %}selected{% endif %}>สั่งซื้อ</option>
+                    <option value="ติดต่อเรา" {% if button_text == 'ติดต่อเรา' %}selected{% endif %}>ติดต่อเรา</option>
+                    <option value="อ่านต่อ" {% if button_text == 'อ่านต่อ' %}selected{% endif %}>อ่านต่อ</option>
+                    <option value="__CUSTOM__">กำหนดเอง...</option>
+                </select>
+                <input type="text" id="buttonTextCustom" name="button_text" placeholder="พิมพ์ข้อความปุ่มเอง" value="{% if button_text and button_text not in ['Apply now', 'สมัครเลย', 'ดูเพิ่มเติม', 'คลิกที่นี่', 'เริ่มใช้งาน', 'ดาวน์โหลด', 'ซื้อเลย', 'สั่งซื้อ', 'ติดต่อเรา', 'อ่านต่อ'] %}{{ button_text }}{% endif %}" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); font-family: inherit; font-size: 14px; background: #fff; outline: none; display: none;">
+            </div>
+
+            <select name="card_size">
+                <option value="large" {% if card_size == 'large' %}selected{% endif %}>ขนาดการ์ด - ใหญ่</option>
+                <option value="small" {% if card_size == 'small' %}selected{% endif %}>ขนาดการ์ด - เล็ก</option>
+            </select>
+
+            <input type="hidden" name="img_url" value="{{ img_url }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="shareRowCompose">
+                <button type="button" class="shareBtnCompose fb" title="แชร์บน Facebook (กด 'เสร็จสิ้น' เพื่อสร้างลิงก์ก่อน)">Facebook</button>
+                <button type="button" class="shareBtnCompose tw" title="แชร์บน Twitter (กด 'เสร็จสิ้น' เพื่อสร้างลิงก์ก่อน)">Twitter</button>
+                <button type="button" class="shareBtnCompose in" title="แชร์บน LinkedIn (กด 'เสร็จสิ้น' เพื่อสร้างลิงก์ก่อน)">LinkedIn</button>
+            </div>
+
+            <div class="cardWrap" style="margin-top:20px;">
+                <div class="cardImg">
+                    {% if img_url %}
+                    <img id="cardImage" src="{{ img_url }}" alt="Preview" onerror="this.style.display='none'" style="transform: scale(1) rotate(0deg); transition: transform 0.2s;">
+                    {% else %}
+                    <span class="muted">Image Preview</span>
+                    {% endif %}
+                </div>
+                <div class="cardBody">
+                    <div id="cardTitle" class="cardTitle">{{ title or 'หัวข้อของคุณ' }}</div>
+                    <div id="cardDesc" class="muted">{{ description or 'คำอธิบายของคุณ' }}</div>
+                    
+                </div>
+            </div>
+
+            <div class="cropper-controls-wrapper">
+                <i class="fa fa-undo-alt icon icon-rotate-left rotate-ccw-btn text-gray-600 text-xs" id="rotateLeftBtn" title="Rotate Left"></i>
+                <div class="slider-wrapper">
+                    <i class="fa fa-image text-gray-700" style="font-size: 14px;"></i>
+                    <input type="range" id="zoomSlider" min="50" max="300" value="100" step="1">
+                    <i class="fa fa-lg fa-image text-gray-700"></i>
+                </div>
+                <i class="fa fa-redo-alt icon icon-rotate-right rotate-cw-btn text-gray-600 text-xs" id="rotateRightBtn" title="Rotate Right"></i>
+            </div>
+
+            <div class="actions" style="margin-top:20px;">
+                <button type="button" id="backBtn" class="back">&larr; ย้อนกลับ</button>
+                <button type="submit" class="finish" onclick="return handleFormSubmit();">เสร็จสิ้น &rarr;</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        (function () {
+            var titleEl = document.getElementById('title');
+            var descEl = document.getElementById('description');
+            var titleCount = document.getElementById('titleCount');
+            var descCount = document.getElementById('descCount');
+            var backBtn = document.getElementById('backBtn');
+            var cardTitle = document.getElementById('cardTitle');
+            var cardDesc = document.getElementById('cardDesc');
+                        var destInput = document.querySelector('input[name="dest_url"]');
+            var cardImage = document.getElementById('cardImage');
+            var zoomSlider = document.getElementById('zoomSlider');
+            var rotateLeftBtn = document.getElementById('rotateLeftBtn');
+            var rotateRightBtn = document.getElementById('rotateRightBtn');
+            var buttonTextSelect = document.getElementById('buttonTextSelect');
+            var buttonTextCustom = document.getElementById('buttonTextCustom');
+
+            var currentZoom = 100;
+            var currentRotation = 0;
+
+            // ตรวจสอบอัตราส่วนรูปและปรับการ์ดพรีวิว
+            if (cardImage) {
+                function checkImageRatio(img, cardImgElement) {
+                    if (!img || !cardImgElement) return;
+                    img.onload = function () {
+                        var ratio = img.naturalWidth / img.naturalHeight;
+                        // ถ้ารูปเป็นสี่เหลี่ยมจัตุรัส (ratio ใกล้ 1.0) ให้เพิ่ม class square
+                        if (Math.abs(ratio - 1.0) < 0.1) {
+                            cardImgElement.classList.add('square');
+                        } else {
+                            cardImgElement.classList.remove('square');
+                        }
+                    };
+                    // ถ้ารูปโหลดเสร็จแล้วให้ตรวจสอบทันที
+                    if (img.complete && img.naturalWidth > 0) {
+                        var ratio = img.naturalWidth / img.naturalHeight;
+                        if (Math.abs(ratio - 1.0) < 0.1) {
+                            cardImgElement.classList.add('square');
+                        } else {
+                            cardImgElement.classList.remove('square');
+                        }
+                    }
+                }
+                var cardImgEl = cardImage.closest('.cardImg');
+                if (cardImgEl) checkImageRatio(cardImage, cardImgEl);
+            }
+
+            // จัดการ Button Text Select
+            if (buttonTextSelect && buttonTextCustom) {
+                // ตรวจสอบว่าค่าปัจจุบันอยู่ใน dropdown หรือไม่
+                var currentValue = buttonTextCustom.value || 'สมัครเลย';
+                var isCustom = true;
+                for (var i = 0; i < buttonTextSelect.options.length; i++) {
+                    if (buttonTextSelect.options[i].value === currentValue && buttonTextSelect.options[i].value !== '__CUSTOM__') {
+                        isCustom = false;
+                        buttonTextSelect.value = currentValue;
+                        break;
+                    }
+                }
+                if (isCustom && currentValue) {
+                    buttonTextSelect.value = '__CUSTOM__';
+                    buttonTextCustom.style.display = 'block';
+                    buttonTextCustom.value = currentValue;
+                }
+
+                buttonTextSelect.addEventListener('change', function () {
+                    if (this.value === '__CUSTOM__') {
+                        buttonTextCustom.style.display = 'block';
+                        buttonTextCustom.focus();
+                    } else {
+                        buttonTextCustom.style.display = 'none';
+                        buttonTextCustom.value = '';
+                    }
+                });
+            }
+
+            function updateCounts() {
+                var t = (titleEl.value || '');
+                var d = (descEl.value || '');
+                titleCount.textContent = t.length + '/115';
+                descCount.textContent = d.length + '/140';
+                if (cardTitle) cardTitle.textContent = t || 'หัวข้อของคุณ';
+                if (cardDesc) cardDesc.textContent = d || 'คำอธิบายของคุณ';
+            }
+
+            titleEl.addEventListener('input', updateCounts);
+            descEl.addEventListener('input', updateCounts);
+            updateCounts();
+
+            
+
+            backBtn.addEventListener('click', function () {
+                window.location.href = '/upload';
+            });
+
+            // ปุ่มแชร์ในหน้า compose (แสดงข้อความแนะนำ)
+            var shareBtnsCompose = document.querySelectorAll('.shareBtnCompose');
+            shareBtnsCompose.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    alert('กรุณากดปุ่ม "เสร็จสิ้น" เพื่อสร้างลิงก์ก่อน แล้วค่อยแชร์');
+                });
+            });
+
+            // ฟังก์ชันสำหรับจัดการ form submit
+            window.handleFormSubmit = function () {
+                if (buttonTextSelect && buttonTextCustom) {
+                    if (buttonTextSelect.value === '__CUSTOM__') {
+                        // ถ้าเลือกกำหนดเอง ให้ใช้ค่าจาก input custom
+                        if (!buttonTextCustom.value.trim()) {
+                            alert('กรุณาพิมพ์ข้อความปุ่ม');
+                            return false;
+                        }
+                        // สร้าง hidden input เพื่อส่งค่า
+                        var hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'button_text';
+                        hiddenInput.value = buttonTextCustom.value.trim();
+                        document.querySelector('form').appendChild(hiddenInput);
+                    } else {
+                        // ถ้าเลือกจาก dropdown ให้ใช้ค่าจาก select
+                        var hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'button_text';
+                        hiddenInput.value = buttonTextSelect.value;
+                        document.querySelector('form').appendChild(hiddenInput);
+                        // ซ่อน input custom เพื่อไม่ให้ส่งค่า
+                        buttonTextCustom.name = '';
+                    }
+                }
+                return true;
+            };
+
+            function updateImageTransform() {
+                if (cardImage) {
+                    var scale = currentZoom / 100;
+                    cardImage.style.transform = 'scale(' + scale + ') rotate(' + currentRotation + 'deg)';
+                }
+            }
+
+            if (zoomSlider) {
+                zoomSlider.addEventListener('input', function () {
+                    currentZoom = parseInt(this.value);
+                    updateImageTransform();
+                });
+            }
+
+            if (rotateLeftBtn) {
+                rotateLeftBtn.addEventListener('click', function () {
+                    currentRotation -= 90;
+                    updateImageTransform();
+                });
+            }
+
+            if (rotateRightBtn) {
+                rotateRightBtn.addEventListener('click', function () {
+                    currentRotation += 90;
+                    updateImageTransform();
+                });
+            }
+
+            // ====== Drag to move preview image (vertical) ======
+            if (cardImage) {
+                var dragging = false;
+                var startY = 0;
+                var currentOffset = 0;
+
+                function applyOffset() {
+                    // จำกัดช่วงการเลื่อนไม่ให้เกินไปมาก (หน่วยเป็น px)
+                    var min = -200;
+                    var max = 200;
+                    var clamped = Math.max(min, Math.min(max, currentOffset));
+                    currentOffset = clamped;
+                    cardImage.style.objectPosition = '50% ' + clamped + 'px';
+                }
+
+                cardImage.addEventListener('mousedown', function (e) {
+                    dragging = true;
+                    startY = e.clientY;
+                    cardImage.style.cursor = 'grabbing';
+                    e.preventDefault();
+                });
+
+                window.addEventListener('mousemove', function (e) {
+                    if (!dragging) return;
+                    var dy = e.clientY - startY;
+                    startY = e.clientY;
+                    currentOffset += dy;
+                    applyOffset();
+                });
+
+                window.addEventListener('mouseup', function () {
+                    if (!dragging) return;
+                    dragging = false;
+                    cardImage.style.cursor = 'grab';
+                });
+
+                cardImage.addEventListener('mouseleave', function () {
+                    // ป้องกันลากออกนอกกรอบแล้วค้าง
+                    dragging = false;
+                    cardImage.style.cursor = 'grab';
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

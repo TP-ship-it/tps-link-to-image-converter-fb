@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Done</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg1: #dff6f7;
+            --bg2: #eaf7ff;
+            --panel: rgba(255, 255, 255, 0.78);
+            --panel2: rgba(255, 255, 255, 0.92);
+            --text: #0f172a;
+            --muted: #6b7280;
+            --border: rgba(148, 163, 184, 0.35);
+            --orange: #f2994a;
+            --orange2: #e67e22;
+            --shadow: 0 18px 55px rgba(15, 23, 42, 0.16);
+            --radius: 18px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background:
+                radial-gradient(1200px 550px at 25% 0%, rgba(255, 255, 255, 0.55) 0%, transparent 55%),
+                radial-gradient(1200px 550px at 75% 0%, rgba(255, 255, 255, 0.35) 0%, transparent 60%),
+                linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 100%);
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
+            padding: 54px 16px;
+        }
+
+        .wrap {
+            max-width: 980px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 26px;
+            box-shadow: var(--shadow);
+            padding: 34px 34px 28px;
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            text-align: center;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            color: rgba(17, 24, 39, 0.55);
+            font-size: 40px;
+            margin: 8px 0 18px;
+        }
+
+        .linkRow {
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--panel2);
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .linkRow input {
+            width: 100%;
+            padding: 14px 14px;
+            border: 0;
+            outline: none;
+            font-family: inherit;
+            font-size: 15px;
+            background: transparent;
+            color: #0f172a;
+        }
+
+        .btn {
+            border: 0;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled { opacity: 0.75; cursor: not-allowed; }
+        .btn:active { transform: translateY(1px); }
+
+        .btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+        .shareLabel {
+            text-align: center;
+            margin-top: 22px;
+            color: rgba(15, 23, 42, 0.55);
+            font-weight: 500;
+        }
+
+        .shareRow {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            max-width: 760px;
+            margin: 12px auto 0;
+        }
+
+        .shareBtn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        .shareBtn svg { width: 18px; height: 18px; fill: currentColor; }
+        .tw { background: #8ecbff; color: #0b2545; }
+        .fb { background: #1977f3; }
+        .in { background: #2a86d8; }
+
+        .sep {
+            margin: 18px 0 10px;
+            text-align: center;
+            color: rgba(15, 23, 42, 0.45);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .actionBtn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange2) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .actionBtn svg { width: 18px; height: 18px; fill: currentColor; }
+
+        
+
+        
+
+        
+
+        .footerNote {
+            margin-top: 18px;
+            text-align: center;
+            color: rgba(15, 23, 42, 0.5);
+            font-size: 13px;
+        }
+
+        @media (max-width: 760px) {
+            .wrap { padding: 22px 18px 18px; }
+            .title { font-size: 28px; }
+            .linkRow { grid-template-columns: 1fr; }
+            .shareRow { grid-template-columns: 1fr; }
+            .actions { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="title">เสร็จแล้ว! ถึงเวลาแชร์ลงโซเชียลแล้ว!</div>
+
+        <div class="linkRow">
+            <input id="link" type="text" value="{{ full_link }}" readonly>
+            <button type="button" id="copyBtn" class="btn">
+                สำเนา
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H6a2 2 0 0 0-2 2v12h2V3h10V1zm3 4H10a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H10V7h9v14z"/></svg>
+            </button>
+        </div>
+
+        <div class="shareLabel">แชร์บน...</div>
+        <div class="shareRow">
+            <a class="shareBtn tw" id="tw" href="#" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 5.9c-.7.3-1.4.5-2.2.6.8-.5 1.3-1.2 1.6-2.1-.7.4-1.5.7-2.4.9-.7-.7-1.6-1.1-2.7-1.1-2.2 0-3.8 2-3.3 4.1-3-.2-5.7-1.6-7.5-3.8-1 1.7-.5 3.9 1.1 5.1-.6 0-1.1-.2-1.6-.4 0 1.8 1.3 3.3 3.1 3.6-.5.1-1.1.1-1.6.1.4 1.5 1.9 2.6 3.6 2.6-1.6 1.3-3.7 1.9-5.9 1.7 1.8 1.2 4 1.9 6.3 1.9 7.7 0 12-6.5 11.7-12.3.8-.6 1.4-1.2 1.9-2z"/></svg>
+                ทวิตเตอร์
+            </a>
+            <a class="shareBtn fb" id="fb" href="#" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.9.3-1.6 1.7-1.6h1.6V4.8c-.3 0-1.4-.1-2.7-.1-2.7 0-4.5 1.6-4.5 4.6V11H7v3h2.4v8h4.1z"/></svg>
+                เฟซบุ๊ก
+            </a>
+            <a class="shareBtn in" id="in" href="#" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0.5 23.5h4V7.98h-4V23.5zM8 7.98h3.8v2.1h.1c.5-1 1.9-2.1 3.9-2.1 4.1 0 4.9 2.7 4.9 6.2v9.3h-4v-8.2c0-2 0-4.5-2.8-4.5s-3.2 2.1-3.2 4.3v8.4h-4V7.98z"/></svg>
+                ลิงค์อิน
+            </a>
+        </div>
+
+        
+
+        <div class="sep">- หรือ -</div>
+
+        <div class="actions">
+            <a class="actionBtn" href="/upload">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+                สร้างการ์ดใหม่
+            </a>
+            <a class="actionBtn" id="similar" href="#">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h10a2 2 0 0 1 2 2v10H10a2 2 0 0 1-2-2V7z"/><path d="M6 17H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                สร้างการ์ดที่คล้ายกัน
+            </a>
+        </div>
+
+        <div class="footerNote">Tip: ถ้ารูปไม่ขึ้นในโพสต์ ให้เอาลิงก์ไปเช็คที่ Facebook Sharing Debugger</div>
+    </div>
+
+    <script>
+        (function () {
+            var fullLink = document.getElementById('link').value;
+            var copyBtn = document.getElementById('copyBtn');
+            var similar = document.getElementById('similar');
+
+            function copyText(value, btn) {
+                if (!value) return;
+                navigator.clipboard.writeText(value).catch(function () {
+                    var t = document.createElement('textarea');
+                    t.value = value;
+                    document.body.appendChild(t);
+                    t.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(t);
+                }).finally(function () {
+                    if (!btn) return;
+                    var original = btn.innerHTML;
+                    btn.innerHTML = 'คัดลอกแล้ว';
+                    btn.disabled = true;
+                    setTimeout(function () {
+                        btn.innerHTML = original;
+                        btn.disabled = false;
+                    }, 1200);
+                });
+            }
+
+            copyBtn.addEventListener('click', function () {
+                copyText(fullLink, copyBtn);
+            });
+
+            document.getElementById('tw').href = 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(fullLink);
+            document.getElementById('fb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(fullLink);
+            document.getElementById('in').href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(fullLink);
+
+            var params = new URLSearchParams();
+            params.set('img_url', '{{ img_url }}');
+            if ('{{ title }}') params.set('title', '{{ title }}');
+            if ('{{ description }}') params.set('description', '{{ description }}');
+            if ('{{ dest_url }}') params.set('dest_url', '{{ dest_url }}');
+            if ('{{ card_size }}') params.set('card_size', '{{ card_size }}');
+            if ('{{ site_name }}') params.set('site_name', '{{ site_name }}');
+            if ('{{ button_text }}') params.set('button_text', '{{ button_text }}');
+            similar.href = '/compose?' + params.toString();
+        })();
+    </script>
+</body>
+</html>

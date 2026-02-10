@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% set tw_card = 'summary' if card_size == 'small' else 'summary_large_image' %}
+    {% if site_name %}
+    <meta property="og:site_name" content="{{ site_name }}">
+    {% endif %}
+    <meta property="og:title" content="{{ title }}">
+    <meta property="og:description" content="{{ description }}">
+    {% if img %}
+    <meta property="og:image" content="{{ img }}">
+    <meta property="og:image:secure_url" content="{{ img }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="628">
+    <meta property="og:image:type" content="image/jpeg">
+    {% endif %}
+    <meta property="og:url" content="{{ url }}">
+    <meta property="og:type" content="website">
+    {% if dest_url %}
+    <meta property="og:see_also" content="{{ dest_url }}">
+    {% endif %}
+    {% if button_text %}
+    <meta name="description" content="{{ description }} - {{ button_text }}">
+    <!-- 
+    ⚠️ หมายเหตุ: ปุ่ม CTA (Apply Now, Learn More, etc.) ไม่สามารถสร้างได้ด้วย Open Graph meta tags
+    ต้องใช้ Facebook Graph API หรือ Ads Manager เท่านั้น
+    ดูคู่มือที่: FACEBOOK_CTA_GUIDE.md
+    -->
+    {% endif %}
+
+    <meta name="twitter:card" content="{{ tw_card }}">
+    <meta name="twitter:title" content="{{ title }}">
+    <meta name="twitter:description" content="{{ description }}">
+    <meta name="twitter:image" content="{{ img }}">
+    {% if dest_url %}
+    <meta name="twitter:url" content="{{ dest_url }}">
+    {% endif %}
+    
+    <!-- Structured Data for Call-to-Action -->
+    {% if dest_url and button_text %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "{{ title }}",
+        "description": "{{ description }}",
+        "url": "{{ url }}",
+        "potentialAction": {
+            "@type": "ReadAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "{{ dest_url }}"
+            }
+        }
+    }
+    </script>
+    {% endif %}
+    
+    {% if dest_url %}
+    <meta name="redirect-url" content="{{ dest_url }}">
+    <script>
+        // Redirect user ไปที่ dest_url โดยตรง (bot จะเห็น meta tags ก่อน)
+        // Bot จะไม่รัน JavaScript ดังนั้น bot จะเห็น meta tags ทั้งหมดก่อน redirect
+        (function() {
+            // ตรวจสอบว่าเป็น bot หรือไม่ (bot จะไม่รัน JavaScript)
+            var isBot = /bot|crawler|spider|crawling|facebookexternalhit|facebot|meta-externalagent|meta-externalfetcher/i.test(navigator.userAgent);
+            
+            if (!isBot) {
+                // ถ้าไม่ใช่ bot ให้ redirect หลังจาก delay เล็กน้อย
+                // เพื่อให้แน่ใจว่า bot เห็น meta tags ก่อน redirect
+                setTimeout(function() {
+                    var meta = document.querySelector('meta[name="redirect-url"]');
+                    if (meta && meta.content) {
+                        window.location.href = meta.content;
+                    }
+                }, 100); // delay 100ms เพื่อให้ bot เห็น meta tags ก่อน
+            }
+        })();
+    </script>
+    {% endif %}
+</head>
+<body>
+    {% if dest_url %}
+    <p>Redirecting to <a href="{{ dest_url }}">{{ dest_url }}</a>...</p>
+    {% endif %}
+</body>
+</html>

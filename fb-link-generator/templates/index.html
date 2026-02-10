@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FB Image Link Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f6f8fc;
+            --panel: #ffffff;
+            --text: #0f172a;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #2563eb;
+            --primary2: #1d4ed8;
+            --focus-ring: rgba(37, 99, 235, 0.14);
+            --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.14);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background:
+                radial-gradient(1200px 400px at 10% 0%, #eaf0ff 0%, transparent 60%),
+                radial-gradient(1000px 500px at 90% 10%, #e8fbf5 0%, transparent 55%),
+                var(--bg);
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 560px;
+            background: var(--panel);
+            border: 1px solid rgba(148, 163, 184, 0.26);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-soft);
+            padding: 26px 22px 24px;
+        }
+
+        .header {
+            margin-bottom: 16px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            margin: 6px 0 4px;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 0.01em;
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .field {
+            margin-top: 10px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 12px 12px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        input {
+            margin-top: 0;
+            border: 1px solid var(--border);
+            background: #fff;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+
+        input:focus {
+            border-color: rgba(37, 99, 235, 0.7);
+            box-shadow: 0 0 0 4px var(--focus-ring);
+            background: #f9fafb;
+        }
+
+        input::placeholder {
+            color: #9ca3af;
+        }
+
+        .fileInput {
+            margin-top: 4px;
+        }
+
+        #preview {
+            display: none;
+            width: 100%;
+            margin: 10px 0 0;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            object-fit: cover;
+            max-height: 260px;
+            background: #f9fafb;
+        }
+
+        .hint {
+            margin-top: 2px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .actions {
+            margin-top: 16px;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary2) 100%);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 12px 25px rgba(37, 99, 235, 0.28);
+            transition: transform 0.08s ease, box-shadow 0.12s ease, filter 0.12s ease;
+        }
+
+        button:hover {
+            filter: brightness(1.03);
+            box-shadow: 0 16px 32px rgba(37, 99, 235, 0.32);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.24);
+        }
+
+        @media (max-width: 640px) {
+            body {
+                align-items: flex-start;
+                padding: 20px 14px;
+            }
+
+            .container {
+                padding: 20px 18px 18px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="eyebrow">FB Link · Open Graph</div>
+            <h2>สร้างลิงก์ฝังรูปภาพสำหรับ Facebook</h2>
+            <p class="subtitle">อัปโหลดรูปหรือใส่ URL รูป แล้วกำหนดปลายทางเพื่อใช้แชร์บนโซเชียลให้ดูมืออาชีพ</p>
+        </div>
+
+        <form action="/create" method="POST" enctype="multipart/form-data" novalidate>
+            <div class="field">
+                <label for="title">หัวข้อโพสต์ (Title)</label>
+                <input id="title" type="text" name="title" placeholder="เช่น โปรโมชันพิเศษสำหรับลูกค้าใหม่" required>
+            </div>
+
+            <div class="field">
+                <label for="img_url">URL รูปภาพ</label>
+                <input id="img_url" type="text" name="img_url" placeholder="แนะนำขนาด 1200x628 พิกเซล">
+                <div class="hint">ถ้าไม่ได้ใส่ URL รูป สามารถอัปโหลดรูปจากไฟล์ด้านล่างแทนได้</div>
+            </div>
+
+            <div class="field">
+                <label for="img_file">อัปโหลดรูปภาพ</label>
+                <input class="fileInput" type="file" name="img_file" accept="image/*" id="img_file">
+                <img id="preview" alt="">
+            </div>
+
+            <div class="field">
+                <label for="dest_url">ลิงก์ปลายทาง</label>
+                <input id="dest_url" type="text" name="dest_url" placeholder="เช่น ลิงก์ Shopee / LINE OA / เว็บไซต์" required>
+            </div>
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="actions">
+                <button type="submit">
+                    สร้างลิงก์
+                    <span>&rarr;</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        (function () {
+            var input = document.getElementById('img_file');
+            var preview = document.getElementById('preview');
+            var maxBytes = 2 * 1024 * 1024;
+
+            function resetPreview() {
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+
+            input.addEventListener('change', function () {
+                resetPreview();
+                var file = input.files && input.files[0];
+                if (!file) return;
+
+                if (file.size > maxBytes) {
+                    alert('ไฟล์ใหญ่เกิน 2MB กรุณาเลือกไฟล์ใหม่');
+                    input.value = '';
+                    return;
+                }
+
+                if (!file.type || file.type.indexOf('image/') !== 0) {
+                    alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น');
+                    input.value = '';
+                    return;
+                }
+
+                var url = URL.createObjectURL(file);
+                preview.src = url;
+                preview.style.display = 'block';
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta property="og:title" content="{{ title }}">
+    <meta property="og:description" content="{{ description }}">
+    <meta property="og:image" content="{{ direct_url }}">
+    <meta property="og:image:secure_url" content="{{ direct_url }}">
+    <meta property="og:url" content="{{ view_url }}">
+    <meta property="og:type" content="website">
+    <style>
+        :root {
+            --bg: #f6f8fc;
+            --panel: #ffffff;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #2563eb;
+            --primary2: #1d4ed8;
+            --shadow: 0 14px 40px rgba(15, 23, 42, 0.10);
+            --radius: 14px;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: radial-gradient(1200px 400px at 10% 0%, #eaf0ff 0%, transparent 60%),
+                        radial-gradient(1000px 500px at 90% 10%, #e8fbf5 0%, transparent 55%),
+                        var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 48px 16px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 22px;
+        }
+
+        h2 { margin: 0 0 6px; font-weight: 700; }
+        .muted { color: var(--muted); font-size: 13px; }
+
+        img { width: 100%; border-radius: var(--radius); border: 1px solid var(--border); }
+
+        input, button {
+            width: 100%;
+            padding: 12px 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        input { border: 1px solid var(--border); background: #f9fafb; }
+
+        button {
+            border: 0;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary2) 100%);
+            color: white;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .line { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+        .line input { margin: 0; }
+
+        .card { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-top: 18px; }
+        .card-img { background: radial-gradient(500px 220px at 50% 0%, #dbeafe 0%, #ecfeff 60%, #ffffff 100%); height: 220px; display: flex; align-items: center; justify-content: center; color: #64748b; font-weight: 600; }
+        .card-body { padding: 14px; }
+        .card-title { font-weight: 700; margin-bottom: 6px; }
+        .card-desc { margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>รูปภาพ</h2>
+        <div class="muted">Direct URL ใช้สำหรับ og:image</div>
+        <img src="{{ direct_url }}" alt="">
+
+    <div class="card">
+        <div class="card-img">
+            <div style="text-align:center; color:#6b6b6b;">Image Preview</div>
+        </div>
+        <div class="card-body">
+            <div class="card-title">{{ title }}</div>
+            <div class="muted card-desc">{{ description }}</div>
+        </div>
+    </div>
+
+    <div class="line">
+        <input id="directUrl" type="text" value="{{ direct_url }}" readonly>
+        <button type="button" id="copyDirect">Copy</button>
+    </div>
+
+    <div class="line">
+        <input id="viewUrl" type="text" value="{{ view_url }}" readonly>
+        <button type="button" id="copyView">Copy</button>
+    </div>
+
+    <div class="muted"><a href="/upload">อัปโหลดรูปใหม่</a></div>
+    </div>
+
+    <script>
+        (function () {
+            function copyText(value, btn) {
+                if (!value) return;
+                navigator.clipboard.writeText(value).catch(function () {
+                    var t = document.createElement('textarea');
+                    t.value = value;
+                    document.body.appendChild(t);
+                    t.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(t);
+                }).finally(function () {
+                    if (!btn) return;
+                    var original = btn.textContent;
+                    btn.textContent = 'คัดลอกแล้ว';
+                    btn.disabled = true;
+                    setTimeout(function () {
+                        btn.textContent = original;
+                        btn.disabled = false;
+                    }, 1200);
+                });
+            }
+
+            document.getElementById('copyDirect').addEventListener('click', function (e) {
+                copyText(document.getElementById('directUrl').value, e.currentTarget);
+            });
+            document.getElementById('copyView').addEventListener('click', function (e) {
+                copyText(document.getElementById('viewUrl').value, e.currentTarget);
+            });
+        })();
+    </script>
+</body>
+</html>
